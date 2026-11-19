@@ -21,16 +21,20 @@ jobs:
         run: |
           mkdir -p proj
           unzip -o cainiao_click.zip -d proj
-          echo "解压完成:"
-          find proj -type f | head -30
+          echo "=== 解压结果 ==="
+          find proj -type f
 
-      - name: 安装 Gradle
+      - name: 安装 Gradle 7.6.4
         uses: gradle/actions/setup-gradle@v3
         with:
-          gradle-version: '8.5'
+          gradle-version: '7.6.4'
 
-      - name: 接受 SDK 许可
-        run: yes | sdkmanager --licenses || true
+      - name: 查看版本
+        run: |
+          java -version
+          gradle -version
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          ls $ANDROID_HOME/platforms || true
 
       - name: 编译 APK
         working-directory: proj
