@@ -1,0 +1,43 @@
+name: Build APK
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出仓库
+        uses: actions/checkout@v4
+
+      - name: 安装 JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: 解压工程
+        run: |
+          mkdir -p proj
+          unzip -o cainiao_click.zip -d proj
+          echo "解压完成:"
+          find proj -type f | head -30
+
+      - name: 安装 Gradle
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: '8.5'
+
+      - name: 接受 SDK 许可
+        run: yes | sdkmanager --licenses || true
+
+      - name: 编译 APK
+        working-directory: proj
+        run: gradle assembleDebug --no-daemon --stacktrace
+
+      - name: 上传 APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: cainiao-click-apk
+          path: proj/app/build/outputs/apk/debug/*.apk
